@@ -1,25 +1,42 @@
 package com.expofp
 
+import android.app.Application
+import android.content.Context
 import android.graphics.Color
-import android.telecom.Call.Details
 import android.view.View
-import com.expofp.fplan.FplanEventsListener
+import androidx.core.content.ContentProviderCompat.requireContext
+import com.expofp.common.GlobalLocationProvider
+import com.expofp.common.LocationProvider
+import com.expofp.crowdconnected.CrowdConnectedProvider
+import com.expofp.crowdconnected.Mode
 import com.expofp.fplan.FplanView
 import com.expofp.fplan.Settings
-import com.facebook.react.bridge.ReadableArray
 import com.facebook.react.uimanager.SimpleViewManager
 import com.facebook.react.uimanager.ThemedReactContext
 import com.facebook.react.uimanager.annotations.ReactProp
-import okhttp3.Route
-
-
 
 
 class ExpofpViewManager : SimpleViewManager<View>() {
   override fun getName() = "ExpofpView"
-
+  companion object {
+    lateinit  var appContext: Context
+  }
   override fun createViewInstance(reactContext: ThemedReactContext): View {
     var settings: Settings = Settings();
+
+    val lpSettings = com.expofp.crowdconnected.Settings(
+      "bd931173",
+      "5139171006c448219db05ca250afff45",
+      "ENYt9213LF8339rlS8P7tH2341VEdK52",
+      Mode.IPS_ONLY
+    )
+    val locationProvider: LocationProvider = CrowdConnectedProvider(
+      ExpofpViewManager.appContext as Application
+      , lpSettings)
+
+    GlobalLocationProvider.init(locationProvider)
+    GlobalLocationProvider.start()
+
 
     var view = FplanView(reactContext)
     view.init("https://demo.expofp.com", settings);
